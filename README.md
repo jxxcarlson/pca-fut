@@ -32,7 +32,7 @@ The dominant eigenvalue is 3, and the dominant eigenvector is `[-0.707, 0.707]`.
 
 The first argument of `pca.principal_componenent` is the number of iterations used in the power method.
 
-NOTE: the first order of business is to use a random seed in `pca.principal_componenent` and to use a convergence test + a maximum number of iterations as the stopping criterion.  Next, we will work on getting the first k eigenvectors.
+NOTE: the first order of business is to use a random seed in `pca.principal_component` and to use a convergence test + a maximum number of iterations as the stopping criterion.  Next, we will work on getting the first k eigenvectors.
 
 
 ## Testing with the repl
