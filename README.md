@@ -1,6 +1,6 @@
 # PCA.fut
 
-The eventual aim of this package is to provide functions for Principal Component Analysis (PCA).  It is a work-in-progress. In fact, it is barely started work.  For the moment it consists of various auxiliary linear algebra functions, plus one function that computes the first principal component: the dominant eigvector and eignvalue of the covariance matrix.  Below is an example. The data is the matrix
+The eventual aim of this package is to provide functions for Principal Component Analysis (PCA).  It is a work-in-progress. In fact, it is barely started work.  For the moment it consists of various auxiliary linear algebra functions, plus one function that computes the first principal component: the dominant eigenvector and eignvalue of the covariance matrix.  Below is an example. The data is the matrix
 
 ```
 data =
