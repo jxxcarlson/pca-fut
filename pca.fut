@@ -43,10 +43,15 @@ module pca = {
   let orthogonalize_to_row_space [m][n] (v: [n]f32) (a: [m][n]f32): [n]f32 =
         reduce (\u  row -> vecsub u (orthogonal_projection u row)) v a
 
+  -- let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
+  --    reduce (\mat row -> mat ++ [orthogonalize_to_row_space row mat]) [a[0]] a[1:m:1]
+
   let orthogonalize_to_row_space_aux  [m][n] (k:i32) (a: [m][n]f32): [m][n]f32 =
     let newRow = orthogonalize_to_row_space a[k] a[0:k:1]
     in a[0:k:1] ++ [newRow] ++ a[k+1:m:1]
 
+  let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
+     loop output = a for i in 1...(m-1)  do orthogonalize_to_row_space_aux i output
 
   let norm_squared [n] (xs: [n]f32): f32 = (dotprod xs xs)
 
