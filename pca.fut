@@ -21,6 +21,13 @@ module pca = {
 
   let vecsub [n] (xs: [n]f32) (ys: [n]f32) : [n]f32 = (map2 (-) xs ys)
 
+  let norm_squared [n] (xs: [n]f32): f32 = (dotprod xs xs)
+
+  let norm [n] (xs: [n]f32): f32 =
+     f32.sqrt (norm_squared xs)
+
+  let normalize [n] (xs: [n]f32): [n]f32 =
+    scalar_mul (1/(norm xs)) xs
 
   -- | orthogonal_projection v a = orthogonal projection of v onto a
   let orthogonal_projection [n] (v: [n]f32) (a: [n]f32): [n]f32 =
@@ -53,13 +60,11 @@ module pca = {
   let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
      loop output = a for i in 1...(m-1)  do orthogonalize_to_row_space_aux i output
 
-  let norm_squared [n] (xs: [n]f32): f32 = (dotprod xs xs)
+  let orthonormalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
+    orthogonalize_matrix a |> map normalize
 
-  let norm [n] (xs: [n]f32): f32 =
-     f32.sqrt (norm_squared xs)
 
-  let normalize [n] (xs: [n]f32): [n]f32 =
-    scalar_mul (1/(norm xs)) xs
+
 
   let cross (xs: [3]f32) (ys: [3]f32): [3]f32 =
     ([xs[1]*ys[2]-xs[2]*ys[1],
