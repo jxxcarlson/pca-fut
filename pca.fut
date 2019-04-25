@@ -7,6 +7,8 @@
 -- and eignevalue of of the covariance matrix using
 -- the power method.  That method still needs work.
 -- It needs a random seed and a convergence test.
+--
+-- See the README for examples
 
 module pca = {
 

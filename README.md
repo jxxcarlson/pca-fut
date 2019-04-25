@@ -1,5 +1,38 @@
 # PCA.fut
 
+The eventual aim of this package is to provide functions for Principal Component Analysis (PCA).  It is a work-in-progress. In fact, it is barely started work.  For the moment it consists of various auxiliary linear algebra functions, plus one function that computes the first principal component: the dominant eigvector and eignvalue of the covariance matrix.  Below is an example. The data is the matrix
+
+```
+data =
+[
+  [1, -1],
+  [0,  1],
+  [-1, 0]
+]
+
+```
+The covariance matrix is the well-known symmetric matrix
+```
+C =
+[
+  [2, -1],
+  [-1, 2]
+]
+```
+The dominant eigenvalue is 3, and the dominant eigenvector is `[-0.707, 0.707]`.  Here is the example run in the futhark repl:
+
+```
+> :load pca.fut
+> let data = pca.small_data
+> data
+[[1.0f32, -1.0f32], [0.0f32, 1.0f32], [-1.0f32, 0.0f32]]
+> pca.principal_component 10 data
+(3.0f32, [-0.7070948f32, 0.7071188f32])
+```
+
+The first argument of `pca.principal_componenent` is the number of iterations used in the power method.
+
+NOTE: the first order of business is to use a random seed in `pca.principal_componenent` and to use a convergence test + a maximum number of iterations as the stopping criterion.  Next, we will work on getting the first k eigenvectors.
 
 
 ## Testing with the repl
@@ -21,7 +54,7 @@ Loading linalg.fut
 > lin.dotprod a b
 -2.0f32
 ```
-## Orthogonalize
+### Orthogonalize
 
 ```
 > lin.orthogonalize a b
