@@ -21,13 +21,32 @@ module pca = {
 
   let vecsub [n] (xs: [n]f32) (ys: [n]f32) : [n]f32 = (map2 (-) xs ys)
 
+
+  -- | orthogonal_projection v a = orthogonal projection of v onto a
+  let orthogonal_projection [n] (v: [n]f32) (a: [n]f32): [n]f32 =
+     let c = (dotprod v a) / (dotprod a a)
+     in scalar_mul c a
+
+  let zero_vector (n: i32): [n]f32 =
+    map (\i -> (f32.i32 0)) (iota n)
+
+  let row_sum [m][n] (a: [m][n]f32): [n]f32 =
+      reduce (\u  row -> vecadd row u) (zero_vector n)  a
+
+  -- | orthogoonalize x y = the component of x perpendicular to y
   let orthogonalize [n] (xs: [n]f32) (ys: [n]f32): [n]f32 =
-    let a = (dotprod xs ys)
-    let b = (dotprod ys ys)
-    let c = (a/b)
-    let ys2 = scalar_mul c ys
-    in
-      (vecsub xs ys2)
+    vecsub xs (orthogonal_projection xs ys)
+
+  -- | Let a be a matrix whose rows are orthogonal.  then
+  -- orthogonalize_to_row_space v a is perpendicular to the
+  -- row space of a
+  let orthogonalize_to_row_space [m][n] (v: [n]f32) (a: [m][n]f32): [n]f32 =
+        reduce (\u  row -> vecsub u (orthogonal_projection u row)) v a
+
+  let orthogonalize_to_row_space_aux  [m][n] (k:i32) (a: [m][n]f32): [m][n]f32 =
+    let newRow = orthogonalize_to_row_space a[k] a[0:k:1]
+    in a[0:k:1] ++ [newRow] ++ a[k+1:m:1]
+
 
   let norm_squared [n] (xs: [n]f32): f32 = (dotprod xs xs)
 
@@ -129,15 +148,16 @@ module pca = {
     let dominant_eigenvlue_ = eigenvalue covariance_matrix dominant_eigenvector_
     in (dominant_eigenvlue_, dominant_eigenvector_)
 
+ let normalize_rows [m][n] (a: [m][n]f32): [m][n]f32 =
+   map (\row -> normalize row) a
 
-
-   let data =
+ let data =
      [[7, 4, 3], [4, 1, 8], [6, 3, 5],
       [8, 6, 1], [8, 5, 7], [7, 2, 9],
       [5, 3, 3], [9, 5, 8], [7, 4, 5],
       [8, 2, 2]]:[10][3]f32
 
-   let small_data =
+ let small_data =
    [[1, -1], [0, 1], [-1, 0]]:[3][2]f32
 }
 
