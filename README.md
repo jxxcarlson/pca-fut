@@ -1,104 +1,29 @@
 # PCA.fut
 
-The eventual aim of this package is to provide functions for Principal Component Analysis (PCA).  It is a work-in-progress. In fact, it is barely started work.  For the moment it consists of various auxiliary linear algebra functions, plus one function that computes the first principal component: the dominant eigenvector and eignvalue of the covariance matrix.  Below is an example. The data is the matrix
+The eventual aim of this package is to provide functions for Principal Component Analysis (PCA) using Futhark.  We quote from [futhark-lang.org](https://futhark-lang.org/):
+
+> Futhark is a small programming language designed to be compiled to efficient parallel code. It is a statically typed, data-parallel, and purely functional array language in the ML family, and comes with a heavily optimising ahead-of-time compiler that presently generates GPU code via CUDA and OpenCL, although the language itself is hardware-agnostic and can also run on multicore CPUs. As a simple example, this function computes the average of an array of 64-bit floating-point numbers:
+
+The present package is very much a work-in-progress. It contains a plethora of basic linear algebra operations, the most interesing of which are as for PCA analysis:
+
+1. `dominant_eigenvector 10 0.0000000001 s seed`: compute an approximate dominant eigenvector and eigenvalue of a symmetric matrix `s` using the given `seed` vector; do this in at most 10 iterations, but stop before if the cosine of the angle between successive approximations is greater than 1 - tolerance.
+
+2. `dominant_eigenvector 10 0.0000000001 a seed subspace`: as above, but under the constraint that the the dominant eigenvector be orthogonal to a given subspace (presaented as the row space of a matrix)
+
+3. `pca.principal_component 10 0.0000000001 data`: compute the principal component of the given data.  For the moment, this function uses a very poorly chosen seed vector.  This flaw will be addressed shortly.  The first two argments are as in 1, 2 atove.
+
+More detail on the use of these and other functions is presented as comments in the source code.  Meanhile, there is  a short comlete example below.  It uses the Futhark repl.  We will add notes on running the code on both the CPU and the GPU later this week.
+
+## Example: compute principal component from data/
+
 
 ```
-data =
-[
-  [1, -1],
-  [0,  1],
-  [-1, 0]
-]
-
-```
-The covariance matrix is the well-known symmetric matrix
-```
-C =
-[
-  [2, -1],
-  [-1, 2]
-]
-```
-The dominant eigenvalue is 3, and the dominant eigenvector is `[-0.707, 0.707]`.  Here is the example run in the futhark repl:
-
-```
+$ futhark.repl
 > :load pca.fut
-> let data = pca.small_data
-> data
-[[1.0f32, -1.0f32], [0.0f32, 1.0f32], [-1.0f32, 0.0f32]]
-> pca.principal_component 10 data
-(3.0f32, [-0.7070948f32, 0.7071188f32])
-```
 
-The first argument of `pca.principal_component` is the number of iterations used in the power method.
+> let data = [[1, -1], [0, 1], [-1, 0]]:[3][2]f32
 
-NOTE: the first order of business is to use a random seed in `pca.principal_component` and to use a convergence test + a maximum number of iterations as the stopping criterion.  Next, we will work on getting the first k eigenvectors.
+> pca.principal_component 10 0.0000000001 data
+  (3.0000005f32, [-0.7070709f32, 0.7071428f32])
 
-
-## Testing with the repl
-
-
-### Scalar and Dot product
-```
-$ futhark repl
-> :load linalg.fut
-Loading linalg.fut
-
-> module lin = mk_linalg f32
-
-> let a = [1,2,3]:[3]f32
-> lin.scalar_mul 2.0 a
-[2.0f32, 4.0f32, 6.0f32]
-
-> let b = [1,0,-1]:[3]f32
-> lin.dotprod a b
--2.0f32
-```
-### Orthogonalize
-
-```
-> lin.orthogonalize a b
-[0.3333333f32, -0.6666667f32, 0.3333333f32]
-```
-Thus `c = lin.orthogonalize a b` is perpendicular to `b`
-
-### Matrix multiplication
-
-```
-> let m = [[1,1,0],[0,1,1],[0,0,1]]:[3][3]f32
-> lin.matmul m m
-[[1.0f32, 2.0f32, 1.0f32], [0.0f32, 1.0f32, 2.0f32], [0.0f32, 0.0f32, 1.0f32]]
-```
-
-### Matrix inverse
-
-```
-> lin.inv m
-[[1.0f32, -1.0f32, 1.0f32], [0.0f32, 1.0f32, -1.0f32], [0.0f32, 0.0f32, 1.0f32]]
-```
-
-### Covariance matrix
-
-```
-> let u = [[1,1,0],[0,1,1]]:[2][3]f32
-> lin.covariance u
-[[2.0f32, 1.0f32], [1.0f32, 2.0f32]]
-```
-
-### Dominant eigenvector
-
-```
-let s = [[2, -1, 0], [-1, 2, -1], [0, -1, 2]]:[3][3]f32
-let v = [1,1,1]:[3]f32
-
-> let ev = lin.dominant_eigenvector 10 s v
-> ev
-[0.50000006f32, -0.70710665f32, 0.50000006f32]
-
-> lin.eigenvalue s ev
-3.4142134f32
-
-> let w = [1,2,3]:[3]f32
-> lin.center_vector w
-[-1.0f32, 0.0f32, 1.0f32]
 ```

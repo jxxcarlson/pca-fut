@@ -180,6 +180,10 @@ module pca = {
   let standard_covariance [m][n] (a: [m][n]f32): [n][n]f32 =
     covariance (center_matrix_cols a)
 
+  -- } Compute the principal component for gicen datqa:
+  -- > let data = [[1, -1], [0, 1], [-1, 0]]:[3][2]f32
+  -- > pca.principal_component 10 0.0000000001 data
+  -- (3.0000005f32, [-0.7070709f32, 0.7071428f32])
   let principal_component [m][n] (iterations: i32) (tolerance: f32) (data: [m][n]f32): (f32, [n]f32) =
     let covariance_matrix = standard_covariance data
     let seed = map (\i -> (f32.i32 i)) (iota n)
