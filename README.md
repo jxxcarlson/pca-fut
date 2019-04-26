@@ -16,6 +16,8 @@ The present package is very much a work-in-progress. It contains a plethora of b
 
 More detail on the use of these and other functions is presented as comments in the source code.  Meanhile, bleow  a short comlete example.  It uses the Futhark repl.  We will add notes on running the code on both the CPU and the GPU later this week.
 
+(For some experiments integrating Futhark computations with an Elm UI, see [this repo](https://github.com/jxxcarlson/heat-futhark))
+
 ## Example: compute principal component from data/
 
 
