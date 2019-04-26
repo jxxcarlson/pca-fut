@@ -1,6 +1,6 @@
 # PCA.fut
 
-![Futhark (Runes)](./futhark.jpg)
+![Futhark (Runes)](./no-y-rune-hafstad.jpg)
 
 The eventual aim of this package is to provide functions for Principal Component Analysis (PCA) using Futhark.  We quote from [futhark-lang.org](https://futhark-lang.org/):
 
