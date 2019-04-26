@@ -10,11 +10,11 @@ The present package is very much a work-in-progress. It contains a plethora of b
 
 1. `dominant_eigenvector 10 0.0000000001 s seed`: compute an approximate dominant eigenvector and eigenvalue of a symmetric matrix `s` using the given `seed` vector; do this in at most 10 iterations, but stop before if the cosine of the angle between successive approximations is greater than 1 - tolerance.
 
-2. `dominant_eigenvector 10 0.0000000001 a seed subspace`: as above, but under the constraint that the the dominant eigenvector be orthogonal to a given subspace (presaented as the row space of a matrix)
+2. `dominant_eigenvector 10 0.0000000001 a seed subspace`: as above, but under the constraint that the the dominant eigenvector be orthogonal to a given subspace (presaented as the row space of a matrix)  With this function one can compute other eigenvectors. For example, to compute the subdomnant eigenvector, let the subspace be that spanned by the dominant eigenvector.
 
 3. `pca.principal_component 10 0.0000000001 data`: compute the principal component of the given data.  For the moment, this function uses a very poorly chosen seed vector.  This flaw will be addressed shortly.  The first two argments are as in 1, 2 atove.
 
-More detail on the use of these and other functions is presented as comments in the source code.  Meanhile, there is  a short comlete example below.  It uses the Futhark repl.  We will add notes on running the code on both the CPU and the GPU later this week.
+More detail on the use of these and other functions is presented as comments in the source code.  Meanhile, bleow  a short comlete example.  It uses the Futhark repl.  We will add notes on running the code on both the CPU and the GPU later this week.
 
 ## Example: compute principal component from data/
 
