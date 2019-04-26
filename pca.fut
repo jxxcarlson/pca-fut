@@ -29,6 +29,9 @@ module pca = {
   let normalize [n] (xs: [n]f32): [n]f32 =
     scalar_mul (1/(norm xs)) xs
 
+  let normalize_rows [m][n] (a: [m][n]f32): [m][n]f32 =
+      map (\row -> normalize row) a
+
   -- | orthogonal_projection v a = orthogonal projection of v onto a
   let orthogonal_projection [n] (v: [n]f32) (a: [n]f32): [n]f32 =
      let c = (dotprod v a) / (dotprod a a)
@@ -41,30 +44,27 @@ module pca = {
       reduce (\u  row -> vecadd row u) (zero_vector n)  a
 
   -- | orthogoonalize x y = the component of x perpendicular to y
-  let orthogonalize [n] (xs: [n]f32) (ys: [n]f32): [n]f32 =
+  let orthogonal_complement [n] (xs: [n]f32) (ys: [n]f32): [n]f32 =
     vecsub xs (orthogonal_projection xs ys)
 
   -- | Let a be a matrix whose rows are orthogonal.  then
-  -- orthogonalize_to_row_space v a is perpendicular to the
+  -- orthogonal_complement_to_row_space v a is perpendicular to the
   -- row space of a
-  let orthogonalize_to_row_space [m][n] (v: [n]f32) (a: [m][n]f32): [n]f32 =
+  let orthogonal_complement_to_row_space [m][n] (v: [n]f32) (a: [m][n]f32): [n]f32 =
         reduce (\u  row -> vecsub u (orthogonal_projection u row)) v a
 
   -- let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
-  --    reduce (\mat row -> mat ++ [orthogonalize_to_row_space row mat]) [a[0]] a[1:m:1]
+  --    reduce (\mat row -> mat ++ [orthogonal_complement_to_row_space row mat]) [a[0]] a[1:m:1]
 
-  let orthogonalize_to_row_space_aux  [m][n] (k:i32) (a: [m][n]f32): [m][n]f32 =
-    let newRow = orthogonalize_to_row_space a[k] a[0:k:1]
+  let orthogonal_complement_to_row_space_aux  [m][n] (k:i32) (a: [m][n]f32): [m][n]f32 =
+    let newRow = orthogonal_complement_to_row_space a[k] a[0:k:1]
     in a[0:k:1] ++ [newRow] ++ a[k+1:m:1]
 
   let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
-     loop output = a for i in 1...(m-1)  do orthogonalize_to_row_space_aux i output
+     loop output = a for i in 1...(m-1)  do orthogonal_complement_to_row_space_aux i output
 
   let orthonormalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
     orthogonalize_matrix a |> map normalize
-
-
-
 
   let cross (xs: [3]f32) (ys: [3]f32): [3]f32 =
     ([xs[1]*ys[2]-xs[2]*ys[1],
@@ -127,8 +127,20 @@ module pca = {
   let step [n] (a: [n][n]f32) (v: [n]f32): [n]f32 =
     matvecmul a v |> normalize
 
-  let dominant_eigenvector [n] (iterations: i32) (a: [n][n]f32) (v: [n]f32): [n]f32 =
-     loop eigenvector = v for i < iterations do step a eigenvector
+  -- |  > let s = [[2,-1],[-1,2]]:[2][2]f32
+  --    > let v = [1,2]:[2]f32
+  --    > pca.dominant_eigenvector2 10 0.0000000001 s v
+  --     (3.0000005f32, [-0.7070709f32, 0.7071428f32])
+  let dominant_eigenvector [n] (max_iterations: i32) (tolerance: f32) (a: [n][n]f32) (v: [n]f32): (f32, [n]f32) =
+     let v1 = normalize v
+     let v2 = step a v1
+     let
+       (w2, w1, k) = loop (u2, u1, j) = (v2, v1, 0)  while
+         (dotprod u1 u2 < 1 - tolerance) || (j > max_iterations) do (step a u2, u2, j+1)
+     let lambda = dotprod (matvecmul a w2) w2
+     in
+       (lambda,w2)
+
 
   let eigenvalue [n] (a: [n][n]f32) (v: [n]f32): f32 =
     dotprod (matvecmul a v) v
@@ -158,8 +170,11 @@ module pca = {
     let dominant_eigenvlue_ = eigenvalue covariance_matrix dominant_eigenvector_
     in (dominant_eigenvlue_, dominant_eigenvector_)
 
- let normalize_rows [m][n] (a: [m][n]f32): [m][n]f32 =
-   map (\row -> normalize row) a
+  -- | I think the below is incorrect
+  let eigenvectors [m] (k: i32) (s: [m][m]f32): [m][m]f32 =
+     loop output = s for i < k do matmul s output |> orthonormalize_matrix
+
+
 
  let data =
      [[7, 4, 3], [4, 1, 8], [6, 3, 5],
@@ -173,3 +188,5 @@ module pca = {
 
 -- http://pillowlab.princeton.edu/teaching/mathtools16/slides/lec09_PCA.pdf
 -- http://hiperfit.dk/pdf/troels-phd-thesis.pdf
+-- http://web.mit.edu/18.06/www/Spring17/Power-Method.pdf
+-- https://math.stackexchange.com/questions/768882/power-method-for-finding-all-eigenvectors
