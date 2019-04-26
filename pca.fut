@@ -50,14 +50,14 @@ module pca = {
   -- | Let a be a matrix whose rows are orthogonal.  then
   -- orthogonal_complement_to_row_space v a is perpendicular to the
   -- row space of a
-  let orthogonal_complement_to_row_space [m][n] (v: [n]f32) (a: [m][n]f32): [n]f32 =
+  let orthogonal_complement_to_row_space [m][n] (a: [m][n]f32) (v: [n]f32): [n]f32 =
         reduce (\u  row -> vecsub u (orthogonal_projection u row)) v a
 
   -- let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
   --    reduce (\mat row -> mat ++ [orthogonal_complement_to_row_space row mat]) [a[0]] a[1:m:1]
 
   let orthogonal_complement_to_row_space_aux  [m][n] (k:i32) (a: [m][n]f32): [m][n]f32 =
-    let newRow = orthogonal_complement_to_row_space a[k] a[0:k:1]
+    let newRow = orthogonal_complement_to_row_space a[0:k:1] a[k]
     in a[0:k:1] ++ [newRow] ++ a[k+1:m:1]
 
   let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
@@ -127,9 +127,10 @@ module pca = {
   let step [n] (a: [n][n]f32) (v: [n]f32): [n]f32 =
     matvecmul a v |> normalize
 
-  -- |  > let s = [[2,-1],[-1,2]]:[2][2]f32
+  -- |  Compute the dominant eigenvector
+  --    > let s = [[2,-1],[-1,2]]:[2][2]f32
   --    > let v = [1,2]:[2]f32
-  --    > pca.dominant_eigenvector2 10 0.0000000001 s v
+  --    > pca.dominant_eigenvector 10 0.0000000001 s v
   --     (3.0000005f32, [-0.7070709f32, 0.7071428f32])
   let dominant_eigenvector [n] (max_iterations: i32) (tolerance: f32) (a: [n][n]f32) (v: [n]f32): (f32, [n]f32) =
      let v1 = normalize v
@@ -139,7 +140,23 @@ module pca = {
          (dotprod u1 u2 < 1 - tolerance) || (j > max_iterations) do (step a u2, u2, j+1)
      let lambda = dotprod (matvecmul a w2) w2
      in
-       (lambda,w2)
+       (lambda, w2)
+
+  -- | Compute the dominant eigenvector orthogonal to a given subspace
+  --   > let subspace = [[-0.7070709f32, 0.7071428f32]]:[1][2]f32
+  --   > pca.dominant_eigenvector2 10 0.0000000001 s v subspace
+  --     (1.0000001f32, [0.7071427f32, 0.7070709f32])
+  let dominant_eigenvector2 [m][n] (max_iterations: i32) (tolerance: f32) (a: [n][n]f32) (v: [n]f32) (subspace: [m][n]f32): (f32, [n]f32) =
+          let v1 = normalize v
+          let v2 = step a v1
+          let
+            (w2, w1, k) = loop (u2, u1, j) = (v2, v1, 0)  while
+              (dotprod u1 u2 < 1 - tolerance) || (j > max_iterations) do
+                let u3 = step a u2 |> orthogonal_complement_to_row_space subspace
+                in (u3, u2, j+1)
+          let lambda = dotprod (matvecmul a w2) w2
+          in
+            (lambda, w2)
 
 
   let eigenvalue [n] (a: [n][n]f32) (v: [n]f32): f32 =
@@ -163,12 +180,10 @@ module pca = {
   let standard_covariance [m][n] (a: [m][n]f32): [n][n]f32 =
     covariance (center_matrix_cols a)
 
-  let principal_component [m][n] (iterations: i32) (data: [m][n]f32): (f32, [n]f32) =
+  let principal_component [m][n] (iterations: i32) (tolerance: f32) (data: [m][n]f32): (f32, [n]f32) =
     let covariance_matrix = standard_covariance data
     let seed = map (\i -> (f32.i32 i)) (iota n)
-    let dominant_eigenvector_ = dominant_eigenvector iterations covariance_matrix seed
-    let dominant_eigenvlue_ = eigenvalue covariance_matrix dominant_eigenvector_
-    in (dominant_eigenvlue_, dominant_eigenvector_)
+    in dominant_eigenvector iterations tolerance covariance_matrix seed
 
   -- | I think the below is incorrect
   let eigenvectors [m] (k: i32) (s: [m][m]f32): [m][m]f32 =
