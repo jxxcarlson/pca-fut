@@ -5,6 +5,9 @@
 The eventual aim of this package is to provide functions for Principal Component Analysis (PCA) using Futhark.  We quote from [futhark-lang.org](https://futhark-lang.org/):
 
 > Futhark is a small programming language designed to be compiled to efficient parallel code. It is a statically typed, data-parallel, and purely functional array language in the ML family, and comes with a heavily optimising ahead-of-time compiler that presently generates GPU code via CUDA and OpenCL, although the language itself is hardware-agnostic and can also run on multicore CPUs. As a simple example, this function computes the average of an array of 64-bit floating-point numbers:
+```
+    let average (xs: []f64) = reduce (+) 0.0 xs / r64 (length xs)
+```
 
 The present package is very much a work-in-progress. It contains a plethora of basic linear algebra operations, the most interesing of which are as for PCA analysis:
 
