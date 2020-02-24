@@ -10,25 +10,47 @@
 --
 -- See the README for examples
 
+-- The "tests" in the comments below were run like this;
+-- $ futhark repl
+-- $ pca.scalar_mul 2 [1, -3]
+-- [2.0f32, -6.0f32]
+
 module pca = {
 
+  -- pca.scalar_mul 2 [1, -3]
+  -- --> [2.0f32, -6.0f32]
   let scalar_mul [n] (s: f32) (xs: [n]f32): [n]f32 = (map (\(x: f32) -> s*x) xs)
 
+
+  -- pca.dotprod [1, 2] [-2, 1]
+  -- --> 0.0f32
   let dotprod [n] (xs: [n]f32) (ys: [n]f32): f32 =
     (reduce (+) (0:f32) (map2 (*) xs ys))
 
+  -- pca.vecadd [2, 3] [-2, -3]
+  -- --> [0.0f32, 0.0f32]
   let vecadd [n] (xs: [n]f32) (ys: [n]f32) : [n]f32 = (map2 (+) xs ys)
 
+  -- pca.vecsub [1, 4] [1, 4]
+  -- -> [0.0f32, 0.0f32]
   let vecsub [n] (xs: [n]f32) (ys: [n]f32) : [n]f32 = (map2 (-) xs ys)
 
+  -- pca.norm_squared [1, 1]
+  -- --> 2.0f32
   let norm_squared [n] (xs: [n]f32): f32 = (dotprod xs xs)
 
+  -- pca.norm [1, 1]
+  -- --> 1.4142135f32
   let norm [n] (xs: [n]f32): f32 =
      f32.sqrt (norm_squared xs)
 
+  -- pca.normalize [1, 1]
+  -- --> [0.70710677f32, 0.70710677f32]
   let normalize [n] (xs: [n]f32): [n]f32 =
     scalar_mul (1/(norm xs)) xs
 
+  -- pca.normalize_rows [[1, 1], [1, -1]]
+  -- --> [[0.70710677f32, 0.70710677f32], [0.70710677f32, -0.70710677f32]]
   let normalize_rows [m][n] (a: [m][n]f32): [m][n]f32 =
       map (\row -> normalize row) a
 
@@ -37,19 +59,35 @@ module pca = {
      let c = (dotprod v a) / (dotprod a a)
      in scalar_mul c a
 
+  -- pca.orthogonal_projection [1, 1] [1, 0]
+  -- --> [1.0f32, 0.0f32]
   let zero_vector (n: i32): [n]f32 =
     map (\i -> (f32.i32 0)) (iota n)
 
+  -- pca.row_sum [[1,2,3]]
+  -- [1.0f32, 2.0f32, 3.0f32]
+  --
+  -- pca.row_sum [[1,2,3], [3,2,1]]
+  --> [4.0f32, 4.0f32, 4.0f32]
   let row_sum [m][n] (a: [m][n]f32): [n]f32 =
       reduce (\u  row -> vecadd row u) (zero_vector n)  a
 
   -- | orthogoonalize x y = the component of x perpendicular to y
+  -- pca.orthogonal_complement [1,1] [1,0]
+  --> [0.0f32, 1.0f32]
   let orthogonal_complement [n] (xs: [n]f32) (ys: [n]f32): [n]f32 =
     vecsub xs (orthogonal_projection xs ys)
 
   -- | Let a be a matrix whose rows are orthogonal.  then
   -- orthogonal_complement_to_row_space v a is perpendicular to the
   -- row space of a
+  --
+  -- pca.orthogonal_complement_to_row_space [[1, 0, 0], [0, 1, 0]] [1,1,1]
+  -- --> [0.0f32, 0.0f32, 1.0f32]
+  --
+  -- The matrix below has the same row space as the matrix above
+  -- pca.orthogonal_complement_to_row_space [[1, -2, 0], [2, 1, 0]] [1,1,1]
+  -- --> [0.0f32, 0.0f32, 1.0f32]
   let orthogonal_complement_to_row_space [m][n] (a: [m][n]f32) (v: [n]f32): [n]f32 =
         reduce (\u  row -> vecsub u (orthogonal_projection u row)) v a
 
@@ -60,32 +98,50 @@ module pca = {
     let newRow = orthogonal_complement_to_row_space a[0:k:1] a[k]
     in a[0:k:1] ++ [newRow] ++ a[k+1:m:1]
 
+  -- pca.orthogonalize_matrix [[1, 1], [0, 1]]
+  -- --> [[1.0f32, 1.0f32], [-0.5f32, 0.5f32]]
   let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
      loop output = a for i in 1...(m-1)  do orthogonal_complement_to_row_space_aux i output
 
+  -- pca.orthonormalize_matrix [[1, 1], [0, 1]]
+  -- --> [[0.70710677f32, 0.70710677f32], [-0.70710677f32, 0.70710677f32]]
   let orthonormalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
     orthogonalize_matrix a |> map normalize
 
+  -- pca.cross [1, 0, 0] [0, 1, 0]
+  -- --> [0.0f32, 0.0f32, 1.0f32]
   let cross (xs: [3]f32) (ys: [3]f32): [3]f32 =
     ([xs[1]*ys[2]-xs[2]*ys[1],
         xs[2]*ys[0]-xs[0]*ys[2],
         xs[0]*ys[1]-xs[1]*ys[0]])
 
+  -- pca.matmul  [[1, 1], [0, 1]] [[1, 2], [0, 1]]
+  -- --> [[1.0f32, 3.0f32], [0.0f32, 1.0f32]]
   let matmul [n][p][m] (xss: [n][p]f32) (yss: [p][m]f32): [n][m]f32 =
     map (\xs -> map (dotprod xs) (transpose yss)) xss
 
+  -- pca.outer [2, 1] [3, 5]
+  -- --> [[6.0f32, 10.0f32], [3.0f32, 5.0f32]]
   let outer [n][m] (xs: [n]f32) (ys: [m]f32): [n][m]f32 =
     matmul (map (\x -> [x]) xs) [ys]
 
+  -- pca.matvecmul [[2, -1], [-1, 2]] [1, 0]
+  -- --> [2.0f32, -1.0f32]
   let matvecmul [n][m] (xss: [n][m]f32) (ys: [m]f32) =
     map (dotprod ys) xss
 
+  -- incorrect resul
   let matvecmul_weird [n][m] (xss: [n][m]f32) (ys: [n]f32) =
     matmul xss (replicate m ys)
 
   let kronecker' [m][n][p][q] (xss: [m][n]f32) (yss: [p][q]f32): [m][n][p][q]f32 =
     map (map (\x -> map (map (*x)) yss)) xss
 
+  -- pca.kronecker [[1, 2], [0, 3]] [[2, -1], [-1, 2]]
+  -- --> [[2.0f32, -1.0f32, 4.0f32, -2.0f32],
+  -- --> [-1.0f32, 2.0f32, -2.0f32, 4.0f32],
+  -- --> [0.0f32, -0.0f32, 6.0f32, -3.0f32],
+  -- --> [-0.0f32, 0.0f32, -3.0f32, 6.0f32]]
   let kronecker [m][n][p][q] (xss: [m][n]f32) (yss: [p][q]f32): [][]f32 =
     kronecker' xss yss -- [m][n][p][q]
     |> map transpose   -- [m][p][n][q]
@@ -105,6 +161,21 @@ module pca = {
                          ) (iota m)
               ) (iota n)
 
+
+  -- In the belowm, the minimal type annotation
+  -- is necessary.
+  --
+  -- Example:
+  --
+  -- let a = [[2, -1], [-1, 2.0]]
+  -- let b = pca.inv a
+  --  :1:17-17:
+  -- Couldn't match expected type `f32' with actual type `f64'.
+  --
+  -- let a = [[2, -1], [-1, 2.0:f32]]
+  -- let b = pca.inv a
+  -- pca.matmul a b
+  -- --> [[1.0f32, 0.0f32], [0.0f32, 1.0f32]]
   let inv [n] (A: [n][n]f32): [n][n]f32 =
     -- Pad the matrix with the identity matrix.
     let Ap = map2 (\row i ->

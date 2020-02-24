@@ -25,7 +25,7 @@ More detail on the use of these and other functions is presented as comments in 
 
 
 ```
-$ futhark.repl
+$ futhark repl
 > :load pca.fut
 
 > let data = [[1, -1], [0, 1], [-1, 0]]:[3][2]f32
@@ -34,3 +34,11 @@ $ futhark.repl
   (3.0000005f32, [-0.7070709f32, 0.7071428f32])
 
 ```
+
+## References
+
+https://www.cs.princeton.edu/picasso/mats/PCA-Tutorial-Intuition_jp.pdf
+
+https://github.com/diku-dk/linalg/blob/master/lib/github.com/diku-dk/linalg/linalg.fut
+
+https://www.cgg.com/technicaldocuments/cggv_0000014063.pdf
