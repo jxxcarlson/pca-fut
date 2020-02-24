@@ -2,3 +2,5 @@
 linalg-th.fut
 data/
 *.c
+benchmarks/bench_matmul
+benchmarks/bench_matmul2
