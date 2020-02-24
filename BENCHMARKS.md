@@ -50,3 +50,55 @@ dataset [400][400]f32 [400][400]f32:        5026.70μs (avg. of 10 runs; RSD: 0.
 dataset [800][800]f32 [800][800]f32:       26640.50μs (avg. of 10 runs; RSD: 0.16)
 dataset [1600][1600]f32 [1600][1600]f32:  151519.50μs (avg. of 10 runs; RSD: 0.04)
 ```
+
+
+## Analysis
+
+
+### Speedup
+
+The third column is (CPU time)/(GPU time).
+
+```
+     CPU      GPU   Speedup
+    1173      348      32.1
+   13225      921      14.4
+   89079     5026      17.7
+  647708    26640      24.3
+12832922   151519      84.7
+```
+
+### Scaling, CPU
+
+Table of the rato:
+
+       execution time for an input of size 2n
+r =    --------------------------------------
+       execution time for an input of size n
+
+Straight, naive complexity theory for matrix
+multiplication says that r should be
+8 = cube of 2.
+
+to
+```
+CPU        Ratio
+1173         -
+13225       11.3
+89079        6.7
+647708      72.4
+12832922    19.8
+
+
+### Scaling, GPU
+
+The same computations for the GPU.
+
+```
+   GPU     Ratio
+   348       -
+   921      2.7
+  5026      5.5
+  6640      5.3
+151519      5.7
+```
