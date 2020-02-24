@@ -38,6 +38,26 @@ module pca = {
     in
     map (\pair -> (map (kd pair.0) pair.1)) indices
 
+  let diag_element (d: f32) (i: i32) (j: i32)  : f32 =
+    if i == j then d else 0f32
+
+  -- let dd = [1.3f32, 7.1]
+  -- pca.diagonal_matrix 2 dd
+  --> [[1.3f32, 0.0f32], [0.0f32, 7.1f32]]
+  let diagonal_matrix (m:i32) (diag: [m]f32) : [m][m]f32 =
+  let
+   indices = zip (iota m) (index_matrix m m)
+  in
+  map (\pair -> (map (diag_element diag[pair.0] pair.0) pair.1)) indices
+
+
+  let absolute_sum [m] (a: [m]f32) : f32 =
+    reduce (\s x -> s + (f32.abs x))  0 a
+
+  let l1_norm [m][n] (a: [m][n]f32) : f32 =
+    (absolute_sum (map absolute_sum a))/(f32.i32 (m * n))
+
+
   -- let foo (m:i32)  =
   --   zip(iota m, index_matrix m m)
 
