@@ -82,7 +82,6 @@ Straight, naive complexity theory for matrix
 multiplication says that r should be
 8 = cube of 2.
 
-to
 ```
 CPU        Ratio
 1173         -
