@@ -8,7 +8,8 @@
   },
   "scripts": {
     "test": "futhark test tests/tests.fut",
-    "bench": "futhark bench benchmarks/bench_matmul.fut"
+    "bench": "futhark bench benchmarks/bench_matmul.fut",
+    "bench-gpu": "futhark bench --backend opencl benchmarks/bench_matmul.fut"
   },
   "repository": {
     "type": "git",
