@@ -26,13 +26,22 @@ More detail on the use of these and other functions is presented as comments in 
 
 ```
 $ futhark repl
-> :load pca.fut
+> :load src/pca.fut
 
 > let data = [[1, -1], [0, 1], [-1, 0]]:[3][2]f32
 
 > pca.principal_component 10 0.0000000001 data
   (3.0000005f32, [-0.7070709f32, 0.7071428f32])
 
+```
+
+## Note
+
+The package.json file has scripts for running tests and benchmarks:
+
+```
+$ npm run test
+$ npm run bench
 ```
 
 ## References
