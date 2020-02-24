@@ -25,10 +25,12 @@ $ npm run bench-cpu
 
 Compiling benchmarks/bench_matmul.fut...
 Results for benchmarks/bench_matmul.fut:
-dataset [10][10]f32 [10][10]f32:           1.10μs (avg. of 10 runs; RSD: 0.27)
-dataset [100][100]f32 [100][100]f32:    1283.90μs (avg. of 10 runs; RSD: 0.16)
-dataset [200][200]f32 [200][200]f32:   12712.20μs (avg. of 10 runs; RSD: 0.16)
-dataset [400][400]f32 [400][400]f32:   73264.50μs (avg. of 10 runs; RSD: 0.03)
+dataset [10][10]f32 [10][10]f32:               1.00μs (avg. of 10 runs; RSD: 0.00)
+dataset [100][100]f32 [100][100]f32:        1173.40μs (avg. of 10 runs; RSD: 0.11)
+dataset [200][200]f32 [200][200]f32:       13225.90μs (avg. of 10 runs; RSD: 0.16)
+dataset [400][400]f32 [400][400]f32:       89079.20μs (avg. of 10 runs; RSD: 0.03)
+dataset [800][800]f32 [800][800]f32:      647708.00μs (avg. of 10 runs; RSD: 0.06)
+dataset [1600][1600]f32 [1600][1600]f32: 12832922.40μs (avg. of 10 runs; RSD: 0.04)
 ```
 
 ## Compiled to OpenCL
@@ -41,8 +43,10 @@ $ npm run bench-gpu
 
 Compiling benchmarks/bench_matmul.fut...
 Results for benchmarks/bench_matmul.fut:
-dataset [10][10]f32 [10][10]f32:         437.10μs (avg. of 10 runs; RSD: 0.22)
-dataset [100][100]f32 [100][100]f32:     434.90μs (avg. of 10 runs; RSD: 0.55)
-dataset [200][200]f32 [200][200]f32:     939.00μs (avg. of 10 runs; RSD: 0.05)
-dataset [400][400]f32 [400][400]f32:    4744.10μs (avg. of 10 runs; RSD: 0.03)
+dataset [10][10]f32 [10][10]f32:             296.10μs (avg. of 10 runs; RSD: 0.24)
+dataset [100][100]f32 [100][100]f32:         348.20μs (avg. of 10 runs; RSD: 0.06)
+dataset [200][200]f32 [200][200]f32:         921.70μs (avg. of 10 runs; RSD: 0.01)
+dataset [400][400]f32 [400][400]f32:        5026.70μs (avg. of 10 runs; RSD: 0.03)
+dataset [800][800]f32 [800][800]f32:       26640.50μs (avg. of 10 runs; RSD: 0.16)
+dataset [1600][1600]f32 [1600][1600]f32:  151519.50μs (avg. of 10 runs; RSD: 0.04)
 ```
