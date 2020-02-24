@@ -72,9 +72,11 @@ The third column is (CPU time)/(GPU time).
 
 Table of the rato:
 
+```
        execution time for an input of size 2n
 r =    --------------------------------------
        execution time for an input of size n
+```
 
 Straight, naive complexity theory for matrix
 multiplication says that r should be
