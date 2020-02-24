@@ -150,9 +150,9 @@ module pca = {
   let orthogonalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
      loop output = a for i in 1...(m-1)  do orthogonal_complement_to_row_space_aux i output
 
-  -- pca.orthonormalize_matrix [[1, 1], [0, 1]]
+  -- pca.orthonormalize [[1, 1], [0, 1]]
   -- --> [[0.70710677f32, 0.70710677f32], [-0.70710677f32, 0.70710677f32]]
-  let orthonormalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
+  let orthonormalize [m][n] (a: [m][n]f32): [m][n]f32 =
     orthogonalize_matrix a |> map normalize
 
 
@@ -175,7 +175,7 @@ module pca = {
 
   let otest [n] (a :[n][n]f32) : [n][n]f32 =
     let
-      b = orthonormalize_matrix a
+      b = orthonormalize a
     in
       matmul b (transpose b)
 
@@ -311,7 +311,7 @@ module pca = {
 
   -- | I think the below is incorrect
   let eigenvectors [m] (k: i32) (s: [m][m]f32): [m][m]f32 =
-     loop output = s for i < k do matmul s output |> orthonormalize_matrix
+     loop output = s for i < k do matmul s output |> orthonormalize
 
 
 
