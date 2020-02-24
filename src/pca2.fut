@@ -78,7 +78,7 @@ module pca = {
     reduce (\s x -> s + (f32.abs x))  0 a
 
   let l1_norm [m][n] (a: [m][n]f32) : f32 =
-    (absolute_sum (map absolute_sum a))/(f32.i32 (m * n))
+    absolute_sum (map absolute_sum a)
 
   let distance [m][n] (a: [m][n]f32) (b: [m][n]f32) : f32 =
     l1_norm (matrixsub a b)
