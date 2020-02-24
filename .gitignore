@@ -1,2 +1,4 @@
 .idea/
 linalg-th.fut
+data/
+*.c

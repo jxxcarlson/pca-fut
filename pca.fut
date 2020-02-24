@@ -120,6 +120,11 @@ module pca = {
   let matmul [n][p][m] (xss: [n][p]f32) (yss: [p][m]f32): [n][m]f32 =
     map (\xs -> map (dotprod xs) (transpose yss)) xss
 
+  let matmul2 [n][m][p] (x: [n][m]i32) (y: [m][p]i32): [n][p]i32 =
+  map (\xr -> map (\yc -> reduce (+) 0 (map2 (*) xr yc))
+                  (transpose y)) x
+
+
   -- pca.outer [2, 1] [3, 5]
   -- --> [[6.0f32, 10.0f32], [3.0f32, 5.0f32]]
   let outer [n][m] (xs: [n]f32) (ys: [m]f32): [n][m]f32 =
@@ -162,20 +167,11 @@ module pca = {
               ) (iota n)
 
 
-  -- In the belowm, the minimal type annotation
-  -- is necessary.
-  --
-  -- Example:
-  --
-  -- let a = [[2, -1], [-1, 2.0]]
-  -- let b = pca.inv a
-  --  :1:17-17:
-  -- Couldn't match expected type `f32' with actual type `f64'.
-  --
-  -- let a = [[2, -1], [-1, 2.0:f32]]
+  -- let a = [[2, -1], [-1, 2]] : [2][2]f32
   -- let b = pca.inv a
   -- pca.matmul a b
   -- --> [[1.0f32, 0.0f32], [0.0f32, 1.0f32]]
+              
   let inv [n] (A: [n][n]f32): [n][n]f32 =
     -- Pad the matrix with the identity matrix.
     let Ap = map2 (\row i ->
@@ -198,11 +194,11 @@ module pca = {
   let step [n] (a: [n][n]f32) (v: [n]f32): [n]f32 =
     matvecmul a v |> normalize
 
-  -- |  Compute the dominant eigenvector
-  --    > let s = [[2,-1],[-1,2]]:[2][2]f32
-  --    > let v = [1,2]:[2]f32
-  --    > pca.dominant_eigenvector 10 0.0000000001 s v
-  --     (3.0000005f32, [-0.7070709f32, 0.7071428f32])
+  -- | Compute the dominant eigenvector
+  -- let s = [[2,-1],[-1,2]]:[2][2]f32
+  -- let v = [1,2]:[2]f32
+  -- pca.dominant_eigenvector 10 0.0000000001 s v
+  -- -->(3.0000005f32, [-0.7070709f32, 0.7071428f32])
   let dominant_eigenvector [n] (max_iterations: i32) (tolerance: f32) (a: [n][n]f32) (v: [n]f32): (f32, [n]f32) =
      let v1 = normalize v
      let v2 = step a v1
