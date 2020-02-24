@@ -17,6 +17,33 @@
 
 module pca = {
 
+  -- zero_matrix 2 3
+  -- --> [[0.0f32, 0.0f32, 0.0f32], [0.0f32, 0.0f32, 0.0f32]]
+  let zero_matrix (m:i32) (n:i32) : [m][n]f32 =
+    replicate m (replicate n 0f32)
+
+
+  let kronecker_delta (i:i32) (j:i32) : f32 = if i == j then 1 else 0
+
+  let kd = kronecker_delta
+
+  let index_matrix (m:i32) (n:i32) : [m][n]i32 =
+    replicate m (iota n)
+
+  --  pca.identity_matrix 2
+  --> [[1.0f32, 0.0f32], [0.0f32, 1.0f32]]
+  let identity_matrix (m:i32) : [m][m]f32 =
+    let
+     indices = zip (iota m) (index_matrix m m)
+    in
+    map (\pair -> (map (kd pair.0) pair.1)) indices
+
+  -- let foo (m:i32)  =
+  --   zip(iota m, index_matrix m m)
+
+  -- identity_matrix (m:i32) : [m][m]f32 =
+
+
   -- pca.scalar_mul 2 [1, -3]
   -- --> [2.0f32, -6.0f32]
   let scalar_mul [n] (s: f32) (xs: [n]f32): [n]f32 = (map (\(x: f32) -> s*x) xs)
@@ -62,7 +89,7 @@ module pca = {
   -- pca.orthogonal_projection [1, 1] [1, 0]
   -- --> [1.0f32, 0.0f32]
   let zero_vector (n: i32): [n]f32 =
-    map (\i -> (f32.i32 0)) (iota n)
+     map (\_ -> (f32.i32 0)) (iota n)
 
   -- pca.row_sum [[1,2,3]]
   -- [1.0f32, 2.0f32, 3.0f32]
@@ -108,6 +135,8 @@ module pca = {
   let orthonormalize_matrix [m][n] (a: [m][n]f32): [m][n]f32 =
     orthogonalize_matrix a |> map normalize
 
+
+
   -- pca.cross [1, 0, 0] [0, 1, 0]
   -- --> [0.0f32, 0.0f32, 1.0f32]
   let cross (xs: [3]f32) (ys: [3]f32): [3]f32 =
@@ -124,6 +153,11 @@ module pca = {
   map (\xr -> map (\yc -> reduce (+) 0 (map2 (*) xr yc))
                   (transpose y)) x
 
+  let otest [n] (a :[n][n]f32) : [n][n]f32 =
+    let
+      b = orthonormalize_matrix a
+    in
+      matmul b (transpose b)
 
   -- pca.outer [2, 1] [3, 5]
   -- --> [[6.0f32, 10.0f32], [3.0f32, 5.0f32]]
@@ -171,7 +205,6 @@ module pca = {
   -- let b = pca.inv a
   -- pca.matmul a b
   -- --> [[1.0f32, 0.0f32], [0.0f32, 1.0f32]]
-              
   let inv [n] (A: [n][n]f32): [n][n]f32 =
     -- Pad the matrix with the identity matrix.
     let Ap = map2 (\row i ->
@@ -203,7 +236,7 @@ module pca = {
      let v1 = normalize v
      let v2 = step a v1
      let
-       (w2, w1, k) = loop (u2, u1, j) = (v2, v1, 0)  while
+       (w2, _, _) = loop (u2, u1, j) = (v2, v1, 0)  while
          (dotprod u1 u2 < 1 - tolerance) || (j > max_iterations) do (step a u2, u2, j+1)
      let lambda = dotprod (matvecmul a w2) w2
      in
@@ -217,7 +250,7 @@ module pca = {
           let v1 = normalize v
           let v2 = step a v1
           let
-            (w2, w1, k) = loop (u2, u1, j) = (v2, v1, 0)  while
+            (w2, _, _) = loop (u2, u1, j) = (v2, v1, 0)  while
               (dotprod u1 u2 < 1 - tolerance) || (j > max_iterations) do
                 let u3 = step a u2 |> orthogonal_complement_to_row_space subspace
                 in (u3, u2, j+1)
