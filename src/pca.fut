@@ -82,6 +82,12 @@ module pca = {
   -- -> [0.0f32, 0.0f32]
   let vecsub [n] (xs: [n]f32) (ys: [n]f32) : [n]f32 = (map2 (-) xs ys)
 
+  let matrixsub [m][n] (a: [m][n]f32) (b: [m][n]f32) : [m][n]f32 =
+    map2 vecsub a b
+
+  let matrixadd [m][n] (a: [m][n]f32) (b: [m][n]f32) : [m][n]f32 =
+    map2 vecadd a b
+    
   -- pca.norm_squared [1, 1]
   -- --> 2.0f32
   let norm_squared [n] (xs: [n]f32): f32 = (dotprod xs xs)
