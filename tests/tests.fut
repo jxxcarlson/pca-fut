@@ -1,4 +1,4 @@
-import "pca"
+import "../src/pca"
 
 entry inv_test [n] (a: [n][n]f32) : [n][n]f32 =
   let b = pca.inv a

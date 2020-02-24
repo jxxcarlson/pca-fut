@@ -4,3 +4,4 @@ data/
 *.c
 benchmarks/bench_matmul
 benchmarks/bench_matmul2
+tests/tests
