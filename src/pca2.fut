@@ -50,20 +50,6 @@ module pca = {
   in
   map (\pair -> (map (diag_element diag[pair.0] pair.0) pair.1)) indices
 
-
-  let absolute_sum [m] (a: [m]f32) : f32 =
-    reduce (\s x -> s + (f32.abs x))  0 a
-
-  let l1_norm [m][n] (a: [m][n]f32) : f32 =
-    (absolute_sum (map absolute_sum a))/(f32.i32 (m * n))
-
-
-  -- let foo (m:i32)  =
-  --   zip(iota m, index_matrix m m)
-
-  -- identity_matrix (m:i32) : [m][m]f32 =
-
-
   -- pca.scalar_mul 2 [1, -3]
   -- --> [2.0f32, -6.0f32]
   let scalar_mul [n] (s: f32) (xs: [n]f32): [n]f32 = (map (\(x: f32) -> s*x) xs)
@@ -81,6 +67,21 @@ module pca = {
   -- pca.vecsub [1, 4] [1, 4]
   -- -> [0.0f32, 0.0f32]
   let vecsub [n] (xs: [n]f32) (ys: [n]f32) : [n]f32 = (map2 (-) xs ys)
+
+  let matrixsub [m][n] (a: [m][n]f32) (b: [m][n]f32) : [m][n]f32 =
+    map2 vecsub a b
+
+  let matrixadd [m][n] (a: [m][n]f32) (b: [m][n]f32) : [m][n]f32 =
+    map2 vecadd a b
+
+  let absolute_sum [m] (a: [m]f32) : f32 =
+    reduce (\s x -> s + (f32.abs x))  0 a
+
+  let l1_norm [m][n] (a: [m][n]f32) : f32 =
+    (absolute_sum (map absolute_sum a))/(f32.i32 (m * n))
+
+  let distance [m][n] (a: [m][n]f32) (b: [m][n]f32) : f32 =
+    l1_norm (matrixsub a b)
 
   -- pca.norm_squared [1, 1]
   -- --> 2.0f32
@@ -172,12 +173,6 @@ module pca = {
   let matmul2 [n][m][p] (x: [n][m]i32) (y: [m][p]i32): [n][p]i32 =
   map (\xr -> map (\yc -> reduce (+) 0 (map2 (*) xr yc))
                   (transpose y)) x
-
-  let otest [n] (a :[n][n]f32) : [n][n]f32 =
-    let
-      b = orthonormalize_matrix a
-    in
-      matmul b (transpose b)
 
   -- pca.outer [2, 1] [3, 5]
   -- --> [[6.0f32, 10.0f32], [3.0f32, 5.0f32]]
@@ -331,6 +326,21 @@ module pca = {
 -- https://math.stackexchange.com/questions/768882/power-method-for-finding-all-eigenvectors
 
 
+-- TESTS
+
+
+let otest [n] (a :[n][n]f32) : [n][n]f32 =
+  let
+    b = orthonormalize_matrix a
+  in
+    matmul b (transpose b)
+
+
+let inv_test [n] (a: [n][n]f32) : [n][n]f32 =
+  let b = inv a
+  in matmul a b
+
+
   -- TEST Matrices
 
   let ut = [[1f32, 1], [0, 1]]
@@ -344,3 +354,17 @@ module pca = {
   let id2 = [[1f32, 0], [0, 1]]
 
   let z2 = [[0f32, 0], [0, 0]]
+
+  -- TESTS
+
+
+  let otest [n] (a :[n][n]f32) : [n][n]f32 =
+    let
+      b = orthonormalize_matrix a
+    in
+      matmul b (transpose b)
+
+
+  let inv_test [n] (a: [n][n]f32) : [n][n]f32 =
+    let b = inv a
+    in matmul a b
