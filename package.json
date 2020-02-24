@@ -1,0 +1,24 @@
+{
+  "name": "pca",
+  "version": "1.0.0",
+  "description": "WIP: pca library for Futhark",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "futhark test tests/tests.fut",
+    "bench": "futhark bench benchmarks/bench_matmul.fut"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jxxcarlson/pca-fut.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jxxcarlson/pca-fut/issues"
+  },
+  "homepage": "https://github.com/jxxcarlson/pca-fut#readme"
+}
