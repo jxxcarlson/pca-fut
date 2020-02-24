@@ -18,10 +18,10 @@ were run on a Macbook Pro.
 ## Compiled to C
 
 ```
-$ npm run bench
+$ npm run bench-cpy
 
 > pca@1.0.0 bench /Users/carlson/dev/futhark/pca
-> futhark bench benchmarks/bench_matmul.fut
+> futhark bench-cpu benchmarks/bench_matmul.fut
 
 Compiling benchmarks/bench_matmul.fut...
 Results for benchmarks/bench_matmul.fut:

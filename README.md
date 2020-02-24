@@ -19,7 +19,7 @@ The present package is very much a work-in-progress. It contains a plethora of b
 
 More detail on the use of these and other functions is presented as comments in the source code.  Meanwhile, below is a short comlete example.  It uses the Futhark repl.  See the file BENCHARKS.md for
 a comparison of performance on matrix multiplication for the C and OpenCL backends.  The latter
-uses the GPU. 
+uses the GPU.
 
 (For some experiments integrating Futhark computations with an Elm UI, see [this repo](https://github.com/jxxcarlson/heat-futhark))
 
@@ -43,7 +43,8 @@ The package.json file has scripts for running tests and benchmarks:
 
 ```
 $ npm run test
-$ npm run bench
+$ npm run bench-cpu
+$ npm run bench-gpu
 ```
 
 ## References
