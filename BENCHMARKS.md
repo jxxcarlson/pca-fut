@@ -18,7 +18,7 @@ were run on a Macbook Pro.
 ## Compiled to C
 
 ```
-$ npm run bench-cpy
+$ npm run bench-cpu
 
 > pca@1.0.0 bench /Users/carlson/dev/futhark/pca
 > futhark bench-cpu benchmarks/bench_matmul.fut
