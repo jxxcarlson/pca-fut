@@ -17,7 +17,7 @@ The present package is very much a work-in-progress. It contains a plethora of b
 
 3. `pca.principal_component 10 0.0000000001 data`: compute the principal component of the given data.  For the moment, this function uses a very poorly chosen seed vector.  This flaw will be addressed shortly.  The first two argments are as in 1, 2 atove.
 
-More detail on the use of these and other functions is presented as comments in the source code.  Meanhile, bleow  a short comlete example.  It uses the Futhark repl.  We will add notes on running the code on both the CPU and the GPU later this week.
+More detail on the use of these and other functions is presented as comments in the source code.  Meanwhile, below is a short comlete example.  It uses the Futhark repl.  We will add notes on running the code on both the CPU and the GPU later this week.
 
 (For some experiments integrating Futhark computations with an Elm UI, see [this repo](https://github.com/jxxcarlson/heat-futhark))
 
