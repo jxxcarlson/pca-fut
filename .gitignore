@@ -5,3 +5,10 @@ data/
 benchmarks/bench_matmul
 benchmarks/bench_matmul2
 tests/tests
+tests/inv_test
+tests/pca_tests
+git st
+**/*.actual
+**/*.expected
+tests/eigen_test
+benchmarks/kronecker

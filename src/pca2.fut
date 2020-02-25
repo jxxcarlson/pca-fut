@@ -356,15 +356,3 @@ let inv_test [n] (a: [n][n]f32) : [n][n]f32 =
   let z2 = [[0f32, 0], [0, 0]]
 
   -- TESTS
-
-
-  let otest [n] (a :[n][n]f32) : [n][n]f32 =
-    let
-      b = orthonormalize_matrix a
-    in
-      matmul b (transpose b)
-
-
-  let inv_test [n] (a: [n][n]f32) : [n][n]f32 =
-    let b = inv a
-    in matmul a b

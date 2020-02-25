@@ -9,7 +9,9 @@
   "scripts": {
     "test": "futhark test tests/pca_tests.fut",
     "bench-cpu": "futhark bench benchmarks/bench_matmul.fut",
-    "bench-gpu": "futhark bench --backend opencl benchmarks/bench_matmul.fut"
+    "bench-gpu": "futhark bench --backend opencl benchmarks/bench_matmul.fut",
+    "bench-cpu-k": "futhark bench benchmarks/kronecker.fut",
+    "bench-gpu-k": "futhark bench --backend opencl benchmarks/kronecker.fut"
   },
   "repository": {
     "type": "git",
